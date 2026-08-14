@@ -22,6 +22,11 @@ const createTodo = (title: string): Todo => ({
 export default function App() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [input, setInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredTodos = todos.filter((todo) =>
+    todo.title.toLowerCase().includes(searchQuery.trim().toLowerCase()),
+  );
 
   const addTodo = () => {
     if (input.trim() === '') return;
@@ -61,8 +66,17 @@ export default function App() {
         </Pressable>
       </View>
 
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search todos..."
+        placeholderTextColor="#9ca3af"
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        returnKeyType="search"
+      />
+
       <FlatList
-        data={todos}
+        data={filteredTodos}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.todoRow}>
@@ -80,7 +94,11 @@ export default function App() {
         )}
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>No todos yet. Add one above!</Text>
+          <Text style={styles.emptyText}>
+            {searchQuery.trim().length > 0
+              ? 'No todos match your search.'
+              : 'No todos yet. Add one above!'}
+          </Text>
         }
       />
 
@@ -106,6 +124,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: 16,
     gap: 8,
+  },
+  searchInput: {
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 8,
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 16,
+    color: '#111827',
+    marginBottom: 16,
   },
   input: {
     flex: 1,
